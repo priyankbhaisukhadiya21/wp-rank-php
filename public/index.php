@@ -263,6 +263,24 @@ try {
         sendJson($stats);
     }
     
+    // System monitoring endpoint
+    if ($requestUri === '/api/admin/monitor' && $requestMethod === 'GET') {
+        if (!validateAdminToken()) {
+            sendError('Unauthorized', 401);
+        }
+        
+        require_once __DIR__ . '/../src/Services/MonitoringService.php';
+        $monitoring = new WPRank\Services\MonitoringService();
+        
+        $status = $monitoring->getSystemStatus();
+        $alerts = $monitoring->getAlerts();
+        
+        sendJson([
+            'system' => $status,
+            'alerts' => $alerts
+        ]);
+    }
+    
     // Manual domain addition
     if ($requestUri === '/api/admin/add-domain' && $requestMethod === 'POST') {
         if (!validateAdminToken()) {

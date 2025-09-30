@@ -320,8 +320,8 @@ class SubmissionService
         $priority = (int)($options['priority'] ?? 50); // User submissions get higher priority
         
         Database::execute(
-            "INSERT INTO crawl_queue (id, domain, priority, next_attempt_at, attempt_count) 
-             VALUES (?, ?, ?, " . Database::getCurrentTimestamp() . ", 0)",
+            "INSERT INTO crawl_queue (id, domain, priority, next_attempt_at, attempt_count, status, created_at, updated_at) 
+             VALUES (?, ?, ?, NOW(), 0, 'pending', NOW(), NOW())",
             [$queueId, $domain, $priority]
         );
     }

@@ -1,27 +1,61 @@
 #!/usr/bin/env php
 <?php
+
 /**
- * WP-Rank Daily Discovery Script
+ * WP-Rank Daily Discovery
  * 
- * Discovers new WordPress sites from various sources and adds them
- * to the crawl queue. Designed to run once daily via cron.
+ * Discovers new WordPress sites from online sources and adds them to the crawl queue.
+ * This script should be run daily via cron.
+ * 
+ * Usage:
+ *   php bin/discover_daily.php [options]
+ * 
+ * Options:
+ *   --max-sites=N      Maximum number of sites to discover (default: 100)
+ *   --verbose          Show detailed output
+ *   --cleanup          Clean up old discovery records
+ *   --help             Show this help message
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/Config.php';
+require_once __DIR__ . '/../src/Database.php';
+require_once __DIR__ . '/../src/Services/DiscoveryService.php';
+require_once __DIR__ . '/../src/Services/SubmissionService.php';
 
-use WPRank\Config;
-use WPRank\Database;
-use WPRank\Services\DomainDiscoverer;
+use WPRank\Services\DiscoveryService;
 
-// Enable error reporting for CLI
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Parse command line options
+$options = getopt('', [
+    'max-sites::',
+    'verbose',
+    'cleanup',
+    'help'
+]);
 
-// Set memory limit for processing
-ini_set('memory_limit', '256M');
+if (isset($options['help'])) {
+    echo "WP-Rank Daily Discovery\n";
+    echo "Usage: php bin/discover_daily.php [options]\n\n";
+    echo "Options:\n";
+    echo "  --max-sites=N      Maximum number of sites to discover (default: 100)\n";
+    echo "  --verbose          Show detailed output\n";
+    echo "  --cleanup          Clean up old discovery records\n";
+    echo "  --help             Show this help message\n";
+    exit(0);
+}
 
-// Set execution time limit
-set_time_limit(1800); // 30 minutes
+// Configuration
+$config = [
+    'max_sites' => (int)($options['max-sites'] ?? 100),
+    'verbose' => isset($options['verbose']),
+    'cleanup' => isset($options['cleanup'])
+];
+
+// Validate configuration
+if ($config['max_sites'] < 1 || $config['max_sites'] > 1000) {
+    echo "Error: max-sites must be between 1 and 1000\n";
+    exit(1);
+}
 
 class DailyDiscovery
 {

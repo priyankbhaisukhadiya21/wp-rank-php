@@ -1,0 +1,43 @@
+# WP-Rank Automation Cron Jobs
+# 
+# Add these entries to your crontab to automate the ranking system:
+# Run: crontab -e
+# Then add these lines (adjust paths as needed):
+
+# Path to your WP-Rank installation
+# WPRANK_PATH=/path/to/WP-Rank-PHP
+
+# Daily site discovery at 2:00 AM
+0 2 * * * cd /path/to/WP-Rank-PHP && /usr/bin/php bin/discover_daily.php --max-sites=100 --cleanup >> logs/cron.log 2>&1
+
+# Ranking computation at 6:00 AM (after sites have been processed)
+0 6 * * * cd /path/to/WP-Rank-PHP && /usr/bin/php bin/recompute_ranks.php --batch-size=1000 >> logs/cron.log 2>&1
+
+# Queue cleanup every 4 hours
+0 */4 * * * cd /path/to/WP-Rank-PHP && /usr/bin/php bin/cleanup_queue.php >> logs/cron.log 2>&1
+
+# Log rotation weekly (Sunday at midnight)
+0 0 * * 0 find /path/to/WP-Rank-PHP/logs -name "*.log" -mtime +7 -delete
+
+# Database optimization monthly (first day at 3:00 AM)
+0 3 1 * * cd /path/to/WP-Rank-PHP && /usr/bin/php bin/optimize_database.php >> logs/cron.log 2>&1
+
+# Health check every 15 minutes during business hours
+*/15 8-18 * * 1-5 cd /path/to/WP-Rank-PHP && /usr/bin/php bin/health_check.php --quiet >> logs/health.log 2>&1
+
+# Example crontab for production server:
+# Replace /path/to/WP-Rank-PHP with your actual installation path
+
+# # WP-Rank Automation
+# 0 2 * * * cd /var/www/wp-rank-php && php bin/discover_daily.php --max-sites=100 --cleanup
+# 0 6 * * * cd /var/www/wp-rank-php && php bin/recompute_ranks.php --batch-size=1000
+# 0 */4 * * * cd /var/www/wp-rank-php && php bin/cleanup_queue.php
+# 0 0 * * 0 find /var/www/wp-rank-php/logs -name "*.log" -mtime +7 -delete
+# 0 3 1 * * cd /var/www/wp-rank-php && php bin/optimize_database.php
+
+# Additional Notes:
+# 1. Make sure PHP is in your PATH or use full path to PHP binary
+# 2. Ensure the web server user has write permissions to the logs directory
+# 3. Monitor logs regularly to ensure automation is working correctly
+# 4. Adjust timing and batch sizes based on your server capacity and API limits
+# 5. Consider running the crawl worker as a systemd service instead of cron for continuous processing

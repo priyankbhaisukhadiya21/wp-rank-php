@@ -1,18 +1,29 @@
 #!/usr/bin/env php
 <?php
+
 /**
- * WP-Rank Recompute Rankings Script
+ * WP-Rank Ranking Computation
  * 
- * Recalculates efficiency scores and global rankings for all sites
- * based on their latest performance metrics. Designed to run daily
- * after crawling is complete.
+ * Recomputes rankings for all sites based on their latest performance data.
+ * This script should be run daily after crawling is complete.
+ * 
+ * Usage:
+ *   php bin/recompute_ranks.php [options]
+ * 
+ * Options:
+ *   --batch-size=N     Process N sites per batch (default: 1000)
+ *   --verbose          Show detailed output
+ *   --force            Force recomputation even if recently computed
+ *   --help             Show this help message
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/Config.php';
+require_once __DIR__ . '/../src/Database.php';
+require_once __DIR__ . '/../src/Services/RankingService.php';
 
-use WPRank\Config;
-use WPRank\Database;
 use WPRank\Services\RankingService;
+use WPRank\Database;
 
 // Enable error reporting for CLI
 error_reporting(E_ALL);

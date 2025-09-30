@@ -1,0 +1,27 @@
+[Unit]
+Description=WP-Rank Crawl Worker
+After=network.target mysql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/WP-Rank-PHP
+ExecStart=/usr/bin/php bin/crawl_worker.php --verbose --continuous
+Restart=always
+RestartSec=10
+StandardOutput=append:/path/to/WP-Rank-PHP/logs/systemd.log
+StandardError=append:/path/to/WP-Rank-PHP/logs/systemd.log
+
+# Resource limits
+LimitNOFILE=1024
+MemoryLimit=512M
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/path/to/WP-Rank-PHP/logs
+
+[Install]
+WantedBy=multi-user.target
