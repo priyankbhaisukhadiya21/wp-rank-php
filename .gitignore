@@ -1,0 +1,53 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Database files
+*.sqlite
+*.db
+
+# Test files
+test_*.php
+debug_*.php
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/logs/
+
+# Runtime files
+/tmp/
+/cache/
+
+# Build files
+/dist/
+/build/
+
+# Composer
+composer.phar
+
+# PHP
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+
+# Coverage reports
+/coverage/
+clover.xml

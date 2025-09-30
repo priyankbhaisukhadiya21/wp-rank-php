@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Details - WP-Rank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-2xl font-bold hover:text-blue-200">WP-Rank</a>
+                    <span class="text-blue-200">Site Details</span>
+                </div>
+                <a href="/" class="hover:text-blue-200 transition-colors">← Back to Rankings</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="max-w-4xl mx-auto px-4 py-12 text-center">
+        <div class="loading mx-auto mb-4"></div>
+        <p class="text-gray-600">Loading site details...</p>
+    </div>
+
+    <!-- Site Details -->
+    <div id="site-details" class="max-w-4xl mx-auto px-4 py-8" style="display: none;">
+        <!-- Site Header -->
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h1 id="site-domain" class="text-3xl font-bold text-gray-900 mb-2">Loading...</h1>
+                    <div class="flex items-center space-x-4">
+                        <span id="wordpress-badge" class="hidden inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                            ✓ WordPress
+                        </span>
+                        <span id="theme-info" class="text-gray-600"></span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500">Global Rank</div>
+                    <div id="global-rank" class="text-3xl font-bold text-blue-600">#-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- PSI Score -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">PageSpeed Score</h3>
+                        <div id="psi-score" class="text-3xl font-bold text-blue-600 mt-2">-</div>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="gauge" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Google PageSpeed Insights</p>
+            </div>
+
+            <!-- Plugin Count -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Est. Plugins</h3>
+                        <div id="plugin-count" class="text-3xl font-bold text-orange-600 mt-2">-</div>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="puzzle" class="w-6 h-6 text-orange-600"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Based on public assets</p>
+            </div>
+
+            <!-- Efficiency Score -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Efficiency</h3>
+                        <div id="efficiency-score" class="text-3xl font-bold text-green-600 mt-2">-</div>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Combined score</p>
+            </div>
+        </div>
+
+        <!-- Core Web Vitals -->
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Core Web Vitals</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="text-sm text-gray-500 mb-1">Largest Contentful Paint</div>
+                    <div id="lcp-value" class="text-2xl font-bold text-gray-900">-</div>
+                    <div class="text-xs text-gray-500">milliseconds</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm text-gray-500 mb-1">Cumulative Layout Shift</div>
+                    <div id="cls-value" class="text-2xl font-bold text-gray-900">-</div>
+                    <div class="text-xs text-gray-500">ratio</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm text-gray-500 mb-1">Total Blocking Time</div>
+                    <div id="tbt-value" class="text-2xl font-bold text-gray-900">-</div>
+                    <div class="text-xs text-gray-500">milliseconds</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evidence Section -->
+        <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Plugin Detection Evidence</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                Sample public asset URLs used to estimate plugin count. This is not a complete list.
+            </p>
+            <div id="evidence-list" class="space-y-2">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Analysis History</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">PSI Score</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Plugins</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">LCP</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">CLS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table" class="divide-y divide-gray-200">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="max-w-4xl mx-auto px-4 py-12 text-center" style="display: none;">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <strong>Error:</strong> <span id="error-message">Site not found</span>
+        </div>
+        <a href="/" class="text-blue-600 hover:text-blue-800">← Back to Rankings</a>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        
+        // Get domain from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const domain = urlParams.get('domain') || urlParams.get('d');
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            
+            if (domain) {
+                loadSiteDetails(domain);
+            } else {
+                showError('No domain specified');
+            }
+        });
+        
+        // Load site details
+        async function loadSiteDetails(domain) {
+            try {
+                const response = await fetch(`${API_BASE}/api/sites/${encodeURIComponent(domain)}`);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        showError('Site not found in our database');
+                    } else {
+                        showError('Failed to load site details');
+                    }
+                    return;
+                }
+                
+                const data = await response.json();
+                displaySiteDetails(data);
+                
+            } catch (error) {
+                console.error('Failed to load site details:', error);
+                showError('Network error occurred');
+            }
+        }
+        
+        // Display site details
+        function displaySiteDetails(data) {
+            const { site, rank, history, evidence } = data;
+            
+            // Update page title
+            document.title = `${site.domain} - WP-Rank Site Details`;
+            
+            // Site header
+            document.getElementById('site-domain').textContent = site.domain;
+            
+            if (site.is_wordpress) {
+                document.getElementById('wordpress-badge').classList.remove('hidden');
+            }
+            
+            if (site.theme_name) {
+                document.getElementById('theme-info').textContent = `Theme: ${site.theme_name}`;
+            }
+            
+            if (rank) {
+                document.getElementById('global-rank').textContent = `#${rank.global_rank}`;
+                document.getElementById('efficiency-score').textContent = (rank.efficiency_score * 100).toFixed(1) + '%';
+            }
+            
+            // Latest metrics (from most recent history entry)
+            if (history && history.length > 0) {
+                const latest = history[0];
+                
+                document.getElementById('psi-score').textContent = latest.psi_score || 'N/A';
+                document.getElementById('plugin-count').textContent = latest.plugin_est_count !== null ? latest.plugin_est_count : 'N/A';
+                
+                // Core Web Vitals
+                document.getElementById('lcp-value').textContent = latest.lcp_ms ? `${latest.lcp_ms}ms` : 'N/A';
+                document.getElementById('cls-value').textContent = latest.cls !== null ? latest.cls.toFixed(3) : 'N/A';
+                document.getElementById('tbt-value').textContent = latest.tbt_ms ? `${latest.tbt_ms}ms` : 'N/A';
+            }
+            
+            // Evidence
+            displayEvidence(evidence);
+            
+            // History
+            displayHistory(history);
+            
+            // Show the details
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('site-details').style.display = 'block';
+        }
+        
+        // Display evidence
+        function displayEvidence(evidence) {
+            const container = document.getElementById('evidence-list');
+            
+            if (!evidence || evidence.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic">No plugin evidence available</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            evidence.slice(0, 10).forEach(url => { // Show max 10 evidence URLs
+                const div = document.createElement('div');
+                div.className = 'bg-gray-50 p-3 rounded border text-sm font-mono break-all';
+                div.textContent = url;
+                container.appendChild(div);
+            });
+            
+            if (evidence.length > 10) {
+                const moreDiv = document.createElement('div');
+                moreDiv.className = 'text-sm text-gray-500 italic';
+                moreDiv.textContent = `... and ${evidence.length - 10} more asset URLs`;
+                container.appendChild(moreDiv);
+            }
+        }
+        
+        // Display history
+        function displayHistory(history) {
+            const tbody = document.getElementById('history-table');
+            
+            if (!history || history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-3 text-center text-gray-500 italic">No analysis history available</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            history.forEach(entry => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm text-gray-900">${formatDate(entry.created_at)}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${entry.psi_score || 'N/A'}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${entry.plugin_est_count !== null ? entry.plugin_est_count : 'N/A'}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${entry.lcp_ms ? entry.lcp_ms + 'ms' : 'N/A'}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${entry.cls !== null ? entry.cls.toFixed(3) : 'N/A'}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Show error
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('error-state').style.display = 'block';
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Never';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>

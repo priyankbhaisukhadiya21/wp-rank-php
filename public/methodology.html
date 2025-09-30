@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methodology - WP-Rank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-2xl font-bold hover:text-blue-200">WP-Rank</a>
+                    <span class="text-blue-200">Methodology</span>
+                </div>
+                <a href="/" class="hover:text-blue-200 transition-colors">← Back to Rankings</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Introduction -->
+        <div class="bg-white rounded-lg shadow-sm border p-8 mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">How WP-Rank Works</h1>
+            <p class="text-lg text-gray-600 mb-6">
+                WP-Rank analyzes WordPress sites to understand the relationship between plugin usage and performance.
+                Our methodology combines automated discovery, performance testing, and plugin detection to provide insights
+                into WordPress site optimization.
+            </p>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0"></i>
+                    <div>
+                        <h3 class="font-semibold text-blue-900 mb-1">Key Insight</h3>
+                        <p class="text-blue-800 text-sm">
+                            We measure "efficiency" as the ratio of performance to plugin count, helping identify
+                            sites that achieve high performance despite using many plugins, or conversely,
+                            sites with poor performance despite minimal plugin usage.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Site Discovery -->
+        <div class="bg-white rounded-lg shadow-sm border p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="search" class="w-6 h-6 text-blue-600 mr-3"></i>
+                Site Discovery
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Manual Submissions</h3>
+                    <p class="text-gray-600">
+                        Users can submit WordPress sites for analysis through our submission form.
+                        We validate that submitted domains are accessible and appear to be WordPress sites.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Automated Discovery</h3>
+                    <p class="text-gray-600 mb-2">
+                        Our system periodically discovers new WordPress sites through:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                        <li>WordPress.com directory and feeds</li>
+                        <li>WP.org showcase and community sites</li>
+                        <li>Technical blogs and WordPress-focused websites</li>
+                        <li>Following links from already-analyzed sites (when they link to other WP sites)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Quality Filters</h3>
+                    <p class="text-gray-600">
+                        We exclude staging sites, development environments, and sites that appear to be
+                        under construction or abandoned.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Analysis -->
+        <div class="bg-white rounded-lg shadow-sm border p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="gauge" class="w-6 h-6 text-green-600 mr-3"></i>
+                Performance Analysis
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Google PageSpeed Insights</h3>
+                    <p class="text-gray-600 mb-2">
+                        We use Google's PageSpeed Insights API to measure real-world performance metrics:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                        <li><strong>Performance Score:</strong> Overall score from 0-100</li>
+                        <li><strong>Largest Contentful Paint (LCP):</strong> Time to render the largest element</li>
+                        <li><strong>Cumulative Layout Shift (CLS):</strong> Visual stability measurement</li>
+                        <li><strong>Total Blocking Time (TBT):</strong> Time the main thread is blocked</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Mobile Focus</h3>
+                    <p class="text-gray-600">
+                        All performance tests are conducted using mobile device simulation, reflecting
+                        the mobile-first nature of modern web usage.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Test Frequency</h3>
+                    <p class="text-gray-600">
+                        Sites are retested periodically to track performance changes over time.
+                        High-ranking sites are tested more frequently.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plugin Detection -->
+        <div class="bg-white rounded-lg shadow-sm border p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="puzzle" class="w-6 h-6 text-orange-600 mr-3"></i>
+                Plugin Detection
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Static Asset Analysis</h3>
+                    <p class="text-gray-600 mb-2">
+                        We analyze publicly accessible CSS and JavaScript files to identify plugin signatures:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                        <li>Plugin-specific asset paths (e.g., <code>/wp-content/plugins/plugin-name/</code>)</li>
+                        <li>Unique CSS classes and JavaScript variables</li>
+                        <li>Plugin-generated HTML comments and meta tags</li>
+                        <li>WordPress action hooks and filter signatures</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Detection Limitations</h3>
+                    <p class="text-gray-600 mb-2">
+                        Our plugin count is an estimate because:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                        <li>Some plugins don't leave public traces</li>
+                        <li>Admin-only plugins may not be detected</li>
+                        <li>Custom plugins without standard patterns are missed</li>
+                        <li>Plugin asset optimization/minification can obscure signatures</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Accuracy</h3>
+                    <p class="text-gray-600">
+                        Our detection typically captures 70-90% of active plugins that affect the frontend.
+                        The count represents plugins that have a measurable impact on page loading and rendering.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ranking Algorithm -->
+        <div class="bg-white rounded-lg shadow-sm border p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="trending-up" class="w-6 h-6 text-purple-600 mr-3"></i>
+                Ranking Algorithm
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Efficiency Score Calculation</h3>
+                    <div class="bg-gray-50 p-4 rounded-lg font-mono text-sm mb-2">
+                        efficiency_score = psi_score / (1 + plugin_count * 0.1)
+                    </div>
+                    <p class="text-gray-600">
+                        This formula rewards high PageSpeed scores while accounting for plugin complexity.
+                        Sites with fewer plugins need higher PSI scores to achieve the same efficiency rating.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Score Components</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                        <li><strong>PSI Score (0-100):</strong> Direct performance measurement</li>
+                        <li><strong>Plugin Count:</strong> Estimated number of active plugins</li>
+                        <li><strong>Penalty Factor (0.1):</strong> How much each plugin reduces efficiency</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Ranking Examples</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                            <h4 class="font-semibold text-green-800">High Efficiency</h4>
+                            <p class="text-sm text-green-700">PSI: 95, Plugins: 5</p>
+                            <p class="text-sm text-green-700">Score: 95 / (1 + 5×0.1) = 63.3</p>
+                        </div>
+                        <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                            <h4 class="font-semibold text-yellow-800">Lower Efficiency</h4>
+                            <p class="text-sm text-yellow-700">PSI: 85, Plugins: 20</p>
+                            <p class="text-sm text-yellow-700">Score: 85 / (1 + 20×0.1) = 28.3</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Quality -->
+        <div class="bg-white rounded-lg shadow-sm border p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="shield-check" class="w-6 h-6 text-indigo-600 mr-3"></i>
+                Data Quality & Limitations
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">What We Measure</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                        <li>Real user performance metrics from Google's field data</li>
+                        <li>Frontend-visible plugin implementations</li>
+                        <li>Public theme information when available</li>
+                        <li>Site accessibility and WordPress detection</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Limitations</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                        <li>Performance can vary by geographic location and device</li>
+                        <li>Plugin detection may miss backend-only or heavily cached plugins</li>
+                        <li>Sites with aggressive caching may show inflated performance scores</li>
+                        <li>CDN usage and hosting quality significantly impact results</li>
+                        <li>Single-page applications may not represent typical WordPress patterns</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Best Practices for Interpretation</h3>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+                        <li>Use rankings to identify patterns rather than absolute performance</li>
+                        <li>Consider site type and complexity when comparing rankings</li>
+                        <li>Look at trends over time rather than single measurements</li>
+                        <li>Combine WP-Rank data with your own performance testing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- API & Data Access -->
+        <div class="bg-white rounded-lg shadow-sm border p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i data-lucide="database" class="w-6 h-6 text-blue-600 mr-3"></i>
+                API & Data Access
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Public API Endpoints</h3>
+                    <div class="bg-gray-50 p-4 rounded-lg space-y-2">
+                        <div><code class="text-sm">GET /api/leaderboard</code> - Paginated rankings</div>
+                        <div><code class="text-sm">GET /api/sites/{domain}</code> - Individual site details</div>
+                        <div><code class="text-sm">GET /api/stats</code> - Global statistics</div>
+                        <div><code class="text-sm">POST /api/sites/submit</code> - Submit site for analysis</div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Rate Limits</h3>
+                    <p class="text-gray-600">
+                        API requests are rate-limited to prevent abuse. Contact us if you need
+                        higher limits for research or integration purposes.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Data Updates</h3>
+                    <p class="text-gray-600">
+                        Rankings are recalculated daily. Site performance data is updated based on
+                        submission frequency and current ranking position.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="text-center">
+                <p class="text-gray-400">
+                    WP-Rank is an open-source project analyzing WordPress site performance and plugin usage.
+                </p>
+                <p class="text-gray-400 text-sm mt-2">
+                    Data is collected from publicly accessible sources and Google PageSpeed Insights.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

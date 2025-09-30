@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WP-Rank - WordPress Site Rankings</title>
+    <meta name="description" content="Transparent WordPress site rankings based on performance metrics and plugin efficiency">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-3xl font-bold">WP-Rank</h1>
+                    <span class="text-blue-200">WordPress Site Rankings</span>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#rankings" class="hover:text-blue-200 transition-colors">Rankings</a>
+                    <a href="/methodology" class="hover:text-blue-200 transition-colors">Methodology</a>
+                    <a href="#submit" class="hover:text-blue-200 transition-colors">Submit Site</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-5xl font-bold mb-6">Transparent WordPress Rankings</h2>
+            <p class="text-xl text-blue-200 mb-8 max-w-3xl mx-auto">
+                Discover the most efficient WordPress websites based on real performance metrics, 
+                plugin usage, and optimization techniques.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#rankings" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                    View Rankings
+                </a>
+                <a href="#submit" class="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors">
+                    Submit Your Site
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Overview -->
+    <section class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="stats-grid">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-blue-600" id="total-sites">-</div>
+                    <div class="text-gray-600">WordPress Sites</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600" id="avg-efficiency">-</div>
+                    <div class="text-gray-600">Avg Efficiency</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-purple-600" id="avg-psi">-</div>
+                    <div class="text-gray-600">Avg PSI Score</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-orange-600" id="avg-plugins">-</div>
+                    <div class="text-gray-600">Avg Plugins</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard Section -->
+    <section id="rankings" class="py-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4">Global WordPress Rankings</h3>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Rankings based on PageSpeed Insights scores and estimated plugin efficiency. 
+                    All measurements use publicly available data only.
+                </p>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white rounded-lg shadow-sm border p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Min PSI Score</label>
+                        <input type="number" id="min-psi" class="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                               placeholder="0" min="0" max="100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Max Plugins</label>
+                        <input type="number" id="max-plugins" class="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                               placeholder="999" min="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                        <select id="sort-by" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="efficiency">Efficiency Score</option>
+                            <option value="psi">PSI Score</option>
+                            <option value="plugins">Plugin Count</option>
+                            <option value="rank">Rank</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button id="apply-filters" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-12">
+                <div class="loading mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading WordPress site rankings...</p>
+            </div>
+
+            <!-- Leaderboard Table -->
+            <div id="leaderboard-container" class="bg-white rounded-lg shadow-sm border overflow-hidden" style="display: none;">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Domain</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PSI Score</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Est. Plugins</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Efficiency</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Crawl</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination" class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t">
+                    <div class="text-sm text-gray-700" id="pagination-info">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div class="flex space-x-2" id="pagination-controls">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Submit Site Section -->
+    <section id="submit" class="py-16 bg-gray-50">
+        <div class="max-w-3xl mx-auto px-4 text-center">
+            <h3 class="text-3xl font-bold text-gray-900 mb-6">Submit Your WordPress Site</h3>
+            <p class="text-lg text-gray-600 mb-8">
+                Add your WordPress site to our ranking system. We'll analyze it using only publicly available data.
+            </p>
+            
+            <div class="bg-white rounded-lg shadow-sm border p-8">
+                <div class="max-w-md mx-auto">
+                    <div class="mb-4">
+                        <label for="domain-input" class="block text-sm font-medium text-gray-700 mb-2">Domain or URL</label>
+                        <input type="url" id="domain-input" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                               placeholder="https://yoursite.com">
+                    </div>
+                    
+                    <button id="submit-domain" 
+                            class="w-full bg-blue-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors">
+                        Submit for Analysis
+                    </button>
+                    
+                    <div id="submit-result" class="mt-4 hidden">
+                        <!-- Result messages will appear here -->
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 mt-4">
+                        Analysis typically takes 1-2 minutes. Your site will appear in rankings once processed.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">WP-Rank</h4>
+                    <p class="text-gray-400">Transparent WordPress site rankings based on performance and efficiency.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">About</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/methodology" class="hover:text-white transition-colors">Methodology</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">API</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/api/leaderboard" class="hover:text-white transition-colors">Leaderboard API</a></li>
+                        <li><a href="/api/stats" class="hover:text-white transition-colors">Statistics API</a></li>
+                        <li><a href="/api/health" class="hover:text-white transition-colors">Health Check</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Email: contact@wp-rank.org</li>
+                        <li>GitHub: wp-rank/php</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 WP-Rank. Open source project dedicated to WordPress optimization.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = '';
+        
+        // Global variables
+        let currentPage = 1;
+        let currentFilters = {};
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadLeaderboard();
+            setupEventListeners();
+        });
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('apply-filters').addEventListener('click', applyFilters);
+            document.getElementById('submit-domain').addEventListener('click', submitDomain);
+            
+            // Enter key support for domain submission
+            document.getElementById('domain-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    submitDomain();
+                }
+            });
+        }
+        
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/stats`);
+                const data = await response.json();
+                
+                if (data.rankings) {
+                    document.getElementById('total-sites').textContent = data.rankings.total_ranked_sites || 0;
+                    document.getElementById('avg-efficiency').textContent = (data.rankings.avg_efficiency_score || 0).toFixed(3);
+                    document.getElementById('avg-psi').textContent = Math.round(data.rankings.avg_psi_score || 0);
+                    document.getElementById('avg-plugins').textContent = Math.round(data.rankings.avg_plugin_count || 0);
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+        
+        // Load leaderboard
+        async function loadLeaderboard(page = 1, filters = {}) {
+            try {
+                document.getElementById('loading-state').style.display = 'block';
+                document.getElementById('leaderboard-container').style.display = 'none';
+                
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: 50,
+                    ...filters
+                });
+                
+                const response = await fetch(`${API_BASE}/api/leaderboard?${params}`);
+                const data = await response.json();
+                
+                if (data.items) {
+                    displayLeaderboard(data.items);
+                    displayPagination(data.pagination);
+                    currentPage = page;
+                    currentFilters = filters;
+                }
+                
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('leaderboard-container').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Failed to load leaderboard:', error);
+                document.getElementById('loading-state').innerHTML = '<p class="text-red-600">Failed to load rankings. Please try again.</p>';
+            }
+        }
+        
+        // Display leaderboard data
+        function displayLeaderboard(items) {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 cursor-pointer';
+                row.onclick = () => window.open(`/site?domain=${encodeURIComponent(item.domain)}`, '_blank');
+                
+                // PSI Score badge
+                let psiScore = item.psi_score || 0;
+                let psiClass = 'bg-red-100 text-red-800';
+                if (psiScore >= 90) psiClass = 'bg-green-100 text-green-800';
+                else if (psiScore >= 70) psiClass = 'bg-yellow-100 text-yellow-800';
+                else if (psiScore >= 50) psiClass = 'bg-orange-100 text-orange-800';
+                
+                // Efficiency score badge
+                let effScore = (item.efficiency_score * 100).toFixed(1);
+                let effClass = 'bg-blue-100 text-blue-800';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        #${item.rank}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 hover:text-blue-800">
+                        <div class="font-medium">${item.domain}</div>
+                        ${item.theme_name ? `<div class="text-xs text-gray-500">Theme: ${item.theme_name}</div>` : ''}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${psiClass}">
+                            ${psiScore || 'N/A'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${item.plugin_est_count !== null ? item.plugin_est_count : 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${effClass}">
+                            ${effScore}%
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${formatDate(item.last_crawl)}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Display pagination controls
+        function displayPagination(pagination) {
+            const info = document.getElementById('pagination-info');
+            const controls = document.getElementById('pagination-controls');
+            
+            const start = ((pagination.page - 1) * pagination.per_page) + 1;
+            const end = Math.min(pagination.page * pagination.per_page, pagination.total);
+            
+            info.innerHTML = `Showing ${start}-${end} of ${pagination.total} sites`;
+            
+            controls.innerHTML = '';
+            
+            // Previous button
+            if (pagination.page > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'px-3 py-1 text-sm border rounded hover:bg-gray-50';
+                prevBtn.textContent = 'Previous';
+                prevBtn.onclick = () => loadLeaderboard(pagination.page - 1, currentFilters);
+                controls.appendChild(prevBtn);
+            }
+            
+            // Next button
+            if (pagination.page < pagination.total_pages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'px-3 py-1 text-sm border rounded hover:bg-gray-50';
+                nextBtn.textContent = 'Next';
+                nextBtn.onclick = () => loadLeaderboard(pagination.page + 1, currentFilters);
+                controls.appendChild(nextBtn);
+            }
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            const filters = {};
+            
+            const minPsi = document.getElementById('min-psi').value;
+            if (minPsi) filters.min_psi = minPsi;
+            
+            const maxPlugins = document.getElementById('max-plugins').value;
+            if (maxPlugins) filters.max_plugins = maxPlugins;
+            
+            const sortBy = document.getElementById('sort-by').value;
+            if (sortBy) filters.sort = sortBy;
+            
+            loadLeaderboard(1, filters);
+        }
+        
+        // Submit domain
+        async function submitDomain() {
+            const domainInput = document.getElementById('domain-input');
+            const submitBtn = document.getElementById('submit-domain');
+            const resultDiv = document.getElementById('submit-result');
+            
+            const domain = domainInput.value.trim();
+            
+            if (!domain) {
+                showSubmitResult('Please enter a domain or URL', 'error');
+                return;
+            }
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="loading inline-block mr-2"></div>Submitting...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/sites/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: domain })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showSubmitResult(`Success! ${result.domain} has been queued for analysis.`, 'success');
+                    domainInput.value = '';
+                } else {
+                    showSubmitResult(result.error || 'Submission failed', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Submission error:', error);
+                showSubmitResult('Network error. Please try again.', 'error');
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit for Analysis';
+            }
+        }
+        
+        // Show submission result
+        function showSubmitResult(message, type) {
+            const resultDiv = document.getElementById('submit-result');
+            const bgColor = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
+            
+            resultDiv.className = `mt-4 p-4 border rounded ${bgColor}`;
+            resultDiv.textContent = message;
+            resultDiv.classList.remove('hidden');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                resultDiv.classList.add('hidden');
+            }, 5000);
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Never';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+    </script>
+</body>
+</html>
