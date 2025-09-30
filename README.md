@@ -1,19 +1,27 @@
 # WP-Rank PHP
 
+[![PHP Version](https://img.shields.io/badge/PHP-8.0%2B-blue.svg)](https://php.net)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-orange.svg)](https://mysql.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 A WordPress site performance ranking system that analyzes sites based on their PageSpeed Insights scores and estimated plugin counts to determine "efficiency" rankings.
 
-## Overview
+## 🚀 Features
 
-WP-Rank discovers WordPress sites from various sources, analyzes their performance using Google PageSpeed Insights, estimates plugin usage through static asset analysis, and ranks sites by their efficiency (performance relative to complexity).
+- **📊 Performance Analysis**: Uses Google PageSpeed Insights API for real performance data
+- **🔧 Plugin Detection**: Estimates plugin count through frontend asset analysis  
+- **🏆 Efficiency Rankings**: Ranks sites by performance-to-plugin ratio
+- **🌐 REST API**: Complete API for accessing rankings and site data
+- **💻 Web Interface**: Responsive frontend for browsing rankings
+- **🛡️ Anti-Spam Protection**: Rate limiting and duplicate submission detection
+- **📈 Real-time Statistics**: Live submission and ranking statistics
 
-### Key Features
+## 🛠️ Tech Stack
 
-- **Automated Site Discovery**: Finds WordPress sites from multiple sources
-- **Performance Analysis**: Uses Google PageSpeed Insights API for real performance data
-- **Plugin Detection**: Estimates plugin count through frontend asset analysis
-- **Efficiency Rankings**: Ranks sites by performance-to-plugin ratio
-- **REST API**: Complete API for accessing rankings and site data
-- **Web Interface**: Responsive frontend for browsing rankings
+- **Backend**: PHP 8.0+, MySQL 8.0+
+- **Frontend**: HTML, CSS, JavaScript
+- **Dependencies**: Composer packages (Guzzle, PHPDotEnv, UUID)
+- **APIs**: Google PageSpeed Insights
 
 ## Architecture
 
