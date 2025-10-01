@@ -267,7 +267,7 @@ class QueueProcessor {
     /**
      * Update queue item status
      */
-    private function updateQueueItemStatus(int $id, string $status): void {
+    private function updateQueueItemStatus(string $id, string $status): void {
         $sql = "UPDATE crawl_queue SET status = ?, updated_at = NOW() WHERE id = ?";
         Database::execute($sql, [$status, $id]);
     }
@@ -275,7 +275,7 @@ class QueueProcessor {
     /**
      * Mark queue item as completed
      */
-    private function markItemCompleted(int $id, string $result): void {
+    private function markItemCompleted(string $id, string $result): void {
         $sql = "
             UPDATE crawl_queue SET 
                 status = 'completed',
@@ -290,7 +290,7 @@ class QueueProcessor {
     /**
      * Mark queue item for retry
      */
-    private function markItemRetry(int $id, string $error): void {
+    private function markItemRetry(string $id, string $error): void {
         $sql = "
             UPDATE crawl_queue SET 
                 status = 'pending',
@@ -306,7 +306,7 @@ class QueueProcessor {
     /**
      * Mark queue item as failed
      */
-    private function markItemFailed(int $id, string $error): void {
+    private function markItemFailed(string $id, string $error): void {
         $sql = "
             UPDATE crawl_queue SET 
                 status = 'failed',

@@ -411,19 +411,32 @@ class RankingService
      * Recompute global rankings for all sites
      */
     public function recomputeGlobalRankings(): void {
-        // Update global_rank and rank_position based on efficiency_score
-        Database::execute("
-            UPDATE ranks r1
-            SET global_rank = (
-                SELECT COUNT(*) + 1
-                FROM ranks r2
-                WHERE r2.efficiency_score > r1.efficiency_score
-            ),
-            rank_position = (
-                SELECT COUNT(*) + 1
-                FROM ranks r2
-                WHERE r2.efficiency_score > r1.efficiency_score
-            )
+        // First, create a temporary view/table with rankings
+        $db = Database::getInstance();
+        
+        // Use a multi-step approach to avoid MySQL's limitation
+        // Step 1: Create a temporary table with calculated ranks
+        $db->getConnection()->exec("DROP TEMPORARY TABLE IF EXISTS temp_ranks");
+        
+        $db->getConnection()->exec("
+            CREATE TEMPORARY TABLE temp_ranks AS
+            SELECT 
+                site_id,
+                ROW_NUMBER() OVER (ORDER BY efficiency_score DESC) as new_rank
+            FROM ranks 
+            WHERE efficiency_score IS NOT NULL
+            ORDER BY efficiency_score DESC
         ");
+        
+        // Step 2: Update the original table using the temporary table
+        $db->getConnection()->exec("
+            UPDATE ranks r
+            INNER JOIN temp_ranks t ON r.site_id = t.site_id
+            SET r.global_rank = t.new_rank,
+                r.rank_position = t.new_rank
+        ");
+        
+        // Step 3: Clean up temporary table
+        $db->getConnection()->exec("DROP TEMPORARY TABLE temp_ranks");
     }
 }
