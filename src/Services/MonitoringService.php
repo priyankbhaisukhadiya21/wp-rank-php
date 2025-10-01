@@ -13,7 +13,7 @@ class MonitoringService {
     private Config $config;
     
     public function __construct() {
-        $this->db = new Database();
+        $this->db = Database::getInstance();
         $this->config = new Config();
     }
     
@@ -47,7 +47,7 @@ class MonitoringService {
             GROUP BY status
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -81,7 +81,7 @@ class MonitoringService {
             WHERE status = 'completed' 
             AND completed_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)
         ";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $status['processing_rate'] = $stmt->fetchColumn();
         
@@ -104,7 +104,7 @@ class MonitoringService {
             ORDER BY date DESC, source
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $recentDiscovery = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -114,7 +114,7 @@ class MonitoringService {
             FROM discovery_log 
             WHERE DATE(discovered_at) = CURDATE()
         ";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $todayCount = $stmt->fetchColumn();
         
@@ -123,7 +123,7 @@ class MonitoringService {
             SELECT MAX(discovered_at) as last_discovery
             FROM discovery_log
         ";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $lastDiscovery = $stmt->fetchColumn();
         
@@ -150,7 +150,7 @@ class MonitoringService {
             FROM ranks
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $rankingStats = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -164,7 +164,7 @@ class MonitoringService {
             AND s.desktop_score IS NOT NULL
             AND (r.computed_at IS NULL OR r.computed_at < s.last_crawled)
         ";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $rankingStats['sites_needing_update'] = $stmt->fetchColumn();
         
@@ -186,7 +186,7 @@ class MonitoringService {
             AND completed_at IS NOT NULL
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $processingStats = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -199,7 +199,7 @@ class MonitoringService {
         // Database performance
         $sql = "SELECT COUNT(*) as active_connections FROM INFORMATION_SCHEMA.PROCESSLIST WHERE DB = DATABASE()";
         try {
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->db->getConnection()->prepare($sql);
             $stmt->execute();
             $dbConnections = $stmt->fetchColumn();
         } catch (Exception $e) {
@@ -233,7 +233,7 @@ class MonitoringService {
             LIMIT 10
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $queueErrors = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -251,7 +251,7 @@ class MonitoringService {
             LIMIT 5
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $errorPatterns = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -269,13 +269,13 @@ class MonitoringService {
         
         // Total sites
         $sql = "SELECT COUNT(*) FROM sites WHERE status = 'active'";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $stats['total_active_sites'] = $stmt->fetchColumn();
         
         // Sites crawled today
         $sql = "SELECT COUNT(*) FROM sites WHERE DATE(last_crawled) = CURDATE()";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $stats['crawled_today'] = $stmt->fetchColumn();
         
@@ -290,7 +290,7 @@ class MonitoringService {
             AND mobile_score IS NOT NULL 
             AND desktop_score IS NOT NULL
         ";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $avgStats = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -305,7 +305,7 @@ class MonitoringService {
             ORDER BY efficiency_score DESC 
             LIMIT 5
         ";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $stats['top_sites'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -323,7 +323,7 @@ class MonitoringService {
             AND completed_at IS NOT NULL
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $firstCompletion = $stmt->fetchColumn();
         

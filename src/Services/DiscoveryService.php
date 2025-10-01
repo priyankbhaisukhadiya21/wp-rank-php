@@ -29,8 +29,20 @@ class DiscoveryService {
         'wp_engine_blog' => 'https://wpengine.com/blog/feed/',
     ];
     
+    // Google search queries for finding WordPress sites
+    private array $searchQueries = [
+        'site:wordpress.com OR "powered by wordpress" -site:wordpress.org',
+        '"built with wordpress" OR "wordpress theme" -site:wordpress.org',
+        '"wp-content" OR "wp-includes" filetype:html',
+        'inurl:wp-content OR inurl:wp-admin -site:wordpress.org',
+        '"this site uses wordpress" OR "wordpress website"',
+        'business website "wordpress" -tutorial -how-to',
+        'company website "powered by wordpress"',
+        'portfolio "wordpress" -template -theme',
+    ];
+    
     public function __construct() {
-        $this->db = new Database();
+        $this->db = Database::getInstance();
         $this->config = new Config();
         $this->submissionService = new SubmissionService();
         $this->logger = [];
@@ -72,6 +84,12 @@ class DiscoveryService {
             // Method 4: Discover from existing site references
             $referenceSites = $this->discoverFromReferences($maxSites / 4, $verbose);
             $discoveredSites = array_merge($discoveredSites, $referenceSites);
+            
+            // Method 5: Google search discovery (if enabled)
+            if ($this->config->get('GOOGLE_SEARCH_ENABLED')) {
+                $googleSites = $this->discoverFromGoogleSearch($maxSites / 5, $verbose);
+                $discoveredSites = array_merge($discoveredSites, $googleSites);
+            }
             
             // Remove duplicates and validate
             $discoveredSites = array_unique($discoveredSites);
@@ -301,7 +319,7 @@ class DiscoveryService {
      * Check if domain is already known in our system
      */
     private function isAlreadyKnown(string $domain): bool {
-        $stmt = $this->db->prepare("
+        $stmt = $this->db->getConnection()->prepare("
             SELECT 1 FROM sites WHERE domain = ? 
             UNION 
             SELECT 1 FROM crawl_queue WHERE domain = ?
@@ -379,7 +397,7 @@ class DiscoveryService {
             ON DUPLICATE KEY UPDATE discovered_at = NOW()
         ";
         
-        $this->db->execute($sql, [$domain, $source]);
+        Database::execute($sql, [$domain, $source]);
     }
     
     /**
@@ -416,7 +434,7 @@ class DiscoveryService {
             LIMIT ?
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute([$limit]);
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -487,11 +505,102 @@ class DiscoveryService {
     }
     
     /**
+     * Discover sites using Google search
+     */
+    private function discoverFromGoogleSearch(int $maxSites, bool $verbose): array {
+        $sites = [];
+        
+        try {
+            $apiKey = $this->config->get('GOOGLE_SEARCH_API_KEY');
+            $searchEngineId = $this->config->get('GOOGLE_SEARCH_ENGINE_ID');
+            
+            if (!$apiKey || !$searchEngineId) {
+                $this->log("Google search not configured - skipping", $verbose);
+                return $sites;
+            }
+            
+            foreach ($this->searchQueries as $query) {
+                if (count($sites) >= $maxSites) {
+                    break;
+                }
+                
+                $this->log("Google search: {$query}", $verbose);
+                $searchSites = $this->performGoogleSearch($query, $apiKey, $searchEngineId, $verbose);
+                $sites = array_merge($sites, $searchSites);
+                
+                // Respect Google API rate limits
+                sleep(1);
+            }
+            
+        } catch (Exception $e) {
+            $this->log("Error in Google search discovery: " . $e->getMessage(), $verbose);
+        }
+        
+        return array_slice(array_unique($sites), 0, $maxSites);
+    }
+    
+    /**
+     * Perform a Google search and extract domains
+     */
+    private function performGoogleSearch(string $query, string $apiKey, string $searchEngineId, bool $verbose): array {
+        $sites = [];
+        
+        $url = "https://www.googleapis.com/customsearch/v1?" . http_build_query([
+            'key' => $apiKey,
+            'cx' => $searchEngineId,
+            'q' => $query,
+            'num' => 10
+        ]);
+        
+        $content = $this->fetchContent($url);
+        if (!$content) {
+            return $sites;
+        }
+        
+        $data = json_decode($content, true);
+        if (!$data || !isset($data['items'])) {
+            return $sites;
+        }
+        
+        foreach ($data['items'] as $item) {
+            $link = $item['link'] ?? '';
+            if ($link) {
+                $domain = $this->extractDomainFromUrl($link);
+                if ($domain && $this->isValidDomainForDiscovery($domain)) {
+                    $sites[] = $domain;
+                    $this->log("Found via Google: {$domain}", $verbose);
+                }
+            }
+        }
+        
+        return $sites;
+    }
+    
+    /**
+     * Extract domain from URL
+     */
+    private function extractDomainFromUrl(string $url): ?string {
+        $parsed = parse_url($url);
+        if (!$parsed || !isset($parsed['host'])) {
+            return null;
+        }
+        
+        $host = strtolower($parsed['host']);
+        
+        // Remove www. prefix
+        if (strpos($host, 'www.') === 0) {
+            $host = substr($host, 4);
+        }
+        
+        return $host;
+    }
+    
+    /**
      * Clean up old discovery records
      */
     private function cleanupOldRecords(): int {
         $sql = "DELETE FROM discovery_log WHERE discovered_at < DATE_SUB(NOW(), INTERVAL 30 DAY)";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         
         return $stmt->rowCount();
@@ -512,7 +621,7 @@ class DiscoveryService {
             ORDER BY date DESC
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

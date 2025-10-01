@@ -357,4 +357,73 @@ class RankingService
             ]
         ];
     }
+    
+    /**
+     * Update site ranking after analysis
+     * 
+     * @param string $domain Domain to update ranking for
+     */
+    public function updateSiteRanking(string $domain): void {
+        // Get site data
+        $stmt = Database::execute("SELECT id, mobile_score, desktop_score, plugin_count FROM sites WHERE domain = ?", [$domain]);
+        $site = $stmt->fetch();
+        
+        if (!$site) {
+            return;
+        }
+        
+        // Calculate average PSI score
+        $avgPsiScore = null;
+        if ($site['mobile_score'] !== null && $site['desktop_score'] !== null) {
+            $avgPsiScore = ($site['mobile_score'] + $site['desktop_score']) / 2;
+        }
+        
+        // Calculate efficiency score
+        $efficiencyScore = $this->calculateEfficiencyScore($avgPsiScore, $site['plugin_count']);
+        
+        // Update or insert ranking record
+        $rankStmt = Database::execute("SELECT id FROM ranks WHERE site_id = ?", [$site['id']]);
+        $existingRank = $rankStmt->fetch();
+        
+        if ($existingRank) {
+            // Update existing ranking
+            Database::execute(
+                "UPDATE ranks SET efficiency_score = ?, domain = ?, mobile_score = ?, desktop_score = ?, plugin_count = ?, computed_at = NOW() WHERE site_id = ?",
+                [$efficiencyScore, $domain, $site['mobile_score'], $site['desktop_score'], $site['plugin_count'], $site['id']]
+            );
+        } else {
+            // Insert new ranking
+            $rankId = Uuid::v4();
+            Database::execute(
+                "INSERT INTO ranks (id, site_id, efficiency_score, domain, mobile_score, desktop_score, plugin_count, global_rank, computed_at) VALUES (?, ?, ?, ?, ?, ?, ?, 0, NOW())",
+                [$rankId, $site['id'], $efficiencyScore, $domain, $site['mobile_score'], $site['desktop_score'], $site['plugin_count']]
+            );
+        }
+        
+        // Update last_ranked timestamp in sites table
+        Database::execute("UPDATE sites SET last_ranked = NOW() WHERE id = ?", [$site['id']]);
+        
+        // Recompute global rankings
+        $this->recomputeGlobalRankings();
+    }
+    
+    /**
+     * Recompute global rankings for all sites
+     */
+    public function recomputeGlobalRankings(): void {
+        // Update global_rank and rank_position based on efficiency_score
+        Database::execute("
+            UPDATE ranks r1
+            SET global_rank = (
+                SELECT COUNT(*) + 1
+                FROM ranks r2
+                WHERE r2.efficiency_score > r1.efficiency_score
+            ),
+            rank_position = (
+                SELECT COUNT(*) + 1
+                FROM ranks r2
+                WHERE r2.efficiency_score > r1.efficiency_score
+            )
+        ");
+    }
 }

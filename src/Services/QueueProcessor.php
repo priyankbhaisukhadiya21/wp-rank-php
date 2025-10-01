@@ -4,6 +4,7 @@ namespace WPRank\Services;
 
 use WPRank\Database;
 use WPRank\Config;
+use WPRank\Utils\Uuid;
 use Exception;
 use PDO;
 
@@ -133,11 +134,13 @@ class QueueProcessor {
                 throw new Exception("Failed to analyze site");
             }
             
-        // Save or update site data
-        $this->saveSiteData($domain, $analysis);
-        
-        // Update rankings (skip for now until RankingService is updated)
-        // $this->rankingService->updateSiteRanking($domain);            // Mark as completed
+            // Save or update site data
+            $this->saveSiteData($domain, $analysis);
+            
+            // Update rankings
+            $this->rankingService->updateSiteRanking($domain);
+            
+            // Mark as completed
             $this->markItemCompleted($item['id'], 'completed');
             $this->log("Completed: {$domain}", $verbose);
             
@@ -219,7 +222,7 @@ class QueueProcessor {
      */
     private function saveSiteData(string $domain, array $analysis): void {
         // Check if site already exists
-        $stmt = $this->db->prepare("SELECT id FROM sites WHERE domain = ?");
+        $stmt = $this->db->getConnection()->prepare("SELECT id FROM sites WHERE domain = ?");
         $stmt->execute([$domain]);
         $existingSite = $stmt->fetch();
         
@@ -244,15 +247,15 @@ class QueueProcessor {
             ]);
             
         } else {
-            // Insert new site
-            $uuid = $this->generateUUID();
+            // Insert new site with UUID
+            $siteId = \WPRank\Utils\Uuid::v4();
             $sql = "
                 INSERT INTO sites (id, domain, mobile_score, desktop_score, plugin_count, last_crawled, status, is_wordpress, first_seen_at, created_at)
                 VALUES (?, ?, ?, ?, ?, NOW(), 'active', 1, NOW(), NOW())
             ";
             
             $this->db->execute($sql, [
-                $uuid,
+                $siteId,
                 $domain,
                 $analysis['mobile_score'],
                 $analysis['desktop_score'],
@@ -266,7 +269,7 @@ class QueueProcessor {
      */
     private function updateQueueItemStatus(int $id, string $status): void {
         $sql = "UPDATE crawl_queue SET status = ?, updated_at = NOW() WHERE id = ?";
-        $this->db->execute($sql, [$status, $id]);
+        Database::execute($sql, [$status, $id]);
     }
     
     /**
@@ -281,7 +284,7 @@ class QueueProcessor {
                 updated_at = NOW()
             WHERE id = ?
         ";
-        $this->db->execute($sql, [$result, $id]);
+        Database::execute($sql, [$result, $id]);
     }
     
     /**
@@ -326,7 +329,7 @@ class QueueProcessor {
             GROUP BY status
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -356,7 +359,7 @@ class QueueProcessor {
             AND updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)
         ";
         
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->db->getConnection()->prepare($sql);
         $stmt->execute([$daysOld]);
         
         return $stmt->rowCount();
@@ -388,18 +391,5 @@ class QueueProcessor {
      */
     public function getRecentLogs(int $lines = 100): array {
         return array_slice($this->logger, -$lines);
-    }
-    
-    /**
-     * Generate UUID for new records
-     */
-    private function generateUUID(): string {
-        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-        );
     }
 }

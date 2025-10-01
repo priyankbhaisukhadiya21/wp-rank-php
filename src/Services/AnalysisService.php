@@ -12,7 +12,7 @@ class AnalysisService {
     
     public function __construct() {
         $this->config = new Config();
-        $this->psiApiKey = $this->config->get('PSI_API_KEY');
+        $this->psiApiKey = $this->config->get('PSI_API_KEY') ?? 'demo_key';
     }
     
     /**

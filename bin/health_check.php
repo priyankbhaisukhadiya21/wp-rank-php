@@ -18,6 +18,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/Config.php';
 require_once __DIR__ . '/../src/Database.php';
+require_once __DIR__ . '/../src/Services/MonitoringService.php';
 
 use WPRank\Database;
 use WPRank\Config;
@@ -52,7 +53,7 @@ class HealthChecker {
     private array $checks = [];
     
     public function __construct() {
-        $this->db = new Database();
+        $this->db = Database::getInstance();
         $this->appConfig = new Config();
     }
     
@@ -114,19 +115,19 @@ class HealthChecker {
     private function checkDatabase(): array {
         try {
             // Test connection
-            $stmt = $this->db->prepare("SELECT 1");
+            $stmt = $this->db->getConnection()->prepare("SELECT 1");
             $stmt->execute();
             
             // Get basic stats
             $stats = [];
             
             // Count sites
-            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM sites WHERE status = 'active'");
+            $stmt = $this->db->getConnection()->prepare("SELECT COUNT(*) as count FROM sites WHERE status = 'active'");
             $stmt->execute();
             $stats['active_sites'] = $stmt->fetchColumn();
             
             // Count queue items
-            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM crawl_queue WHERE status = 'pending'");
+            $stmt = $this->db->getConnection()->prepare("SELECT COUNT(*) as count FROM crawl_queue WHERE status = 'pending'");
             $stmt->execute();
             $stats['pending_queue'] = $stmt->fetchColumn();
             
@@ -159,7 +160,7 @@ class HealthChecker {
                 GROUP BY status
             ";
             
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->db->getConnection()->prepare($sql);
             $stmt->execute();
             $queueStats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
@@ -218,7 +219,7 @@ class HealthChecker {
                 LIMIT 7
             ";
             
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->db->getConnection()->prepare($sql);
             $stmt->execute();
             $recentDiscovery = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
@@ -269,7 +270,7 @@ class HealthChecker {
                 FROM ranks
             ";
             
-            $stmt = $this->db->prepare($sql);
+            $stmt = $this->db->getConnection()->prepare($sql);
             $stmt->execute();
             $rankingStats = $stmt->fetch(PDO::FETCH_ASSOC);
             
